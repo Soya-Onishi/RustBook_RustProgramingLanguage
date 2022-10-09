@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 enum SpreadsheetCell {
     Int(i32),
     Float(f64),
@@ -111,5 +113,139 @@ fn main() {
         for b in msg.bytes() {
             println!("{}", b);
         }
+    }
+
+    // 新規ハッシュマップの作成
+    {            
+        let mut scores = HashMap::new();
+        scores.insert(String::from("Blue"), 10);
+        scores.insert(String::from("Yellow"), 50);
+        scores.insert(String::from("Red"), 100);
+    }
+
+    // タプルのベクタからハッシュマップを生成する
+    {        
+        let teams = vec![String::from("Blue"), String::from("Yellow"), String::from("Red")];
+        let init_scores = vec![10, 50, 100];
+        
+        let scores: HashMap<_, _> = teams.iter().zip(init_scores.iter()).collect();
+
+        println!("hashmap example: {:?}", scores);
+    }
+
+    // キーやバリューの所有権
+    {     
+        let field_name = String::from("Favorite_color");
+        let field_value = String::from("Blue");
+
+        let mut map = HashMap::new();
+        map.insert(field_name, field_value);
+
+        // 所有権がmapに渡っているので、コンパイルエラーになる
+        // println!("{}, {}", field_name, field_value);
+    }
+    
+    // ハッシュマップの値にアクセスする
+    {                
+        let mut scores = HashMap::new();
+        scores.insert(String::from("Blue"), 10);
+        scores.insert(String::from("Yellow"), 50);        
+
+        let team_name = String::from("Blue");
+        let score = scores.get(&team_name).map(|v| *v).unwrap_or(0);
+        
+        println!("{}: {}", &team_name, score);
+    }
+
+    // ハッシュマップにバリューがないときのみ挿入
+    {     
+        let mut scores = HashMap::new();
+        scores.entry(String::from("Blue")).and_modify(|v| *v = *v + 10).or_insert(50);
+
+        println!("{:?}", scores);
+    }
+
+    // ハッシュマップの操作を利用した単語のカウント
+    {        
+        let text = "hello world wonderful world";
+        let mut map = HashMap::new();
+
+        for word in text.split_whitespace() {
+            map.entry(word).and_modify(|v| *v = *v + 1).or_insert(1);
+        }
+
+        println!("{:?}", map);
+    }
+
+    // 練習問題1: ベクタを使ってmean, median, modeを求める
+    {
+        let mut nums: Vec<i32> = vec![1, 9, 5, 4, 9, 3, 8, 5, 6, 9];
+        nums.sort();
+        
+        let sum: i32 = nums.iter().sum();
+        let average = sum as f32 / nums.len() as f32;
+
+        let median = 
+            if nums.len() % 2 == 0 {
+                let idx = nums.len() / 2 - 1;
+                (nums[idx] + nums[idx + 1]) as f32 / 2_f32
+            } else {
+                let idx = nums.len() / 2;
+                nums[idx] as f32
+            };
+        
+        let mut count = HashMap::new();
+        for &n in nums.iter() {
+            count.entry(n).and_modify(|v| *v = *v + 1).or_insert(1);
+        }
+
+        let max = count.iter().max_by(|(_, v1), (_, v2)| v1.cmp(v2));
+
+        println!("average: {}", average);
+        println!("median: {}", median);
+        if let Some((k, v)) = max {
+            println!("max: ({}, {})", k, v)
+        }
+    }
+
+    // 練習問題2: ビッグラテンへの変換
+    {
+        let text = "first";
+        let mut cs: Vec<_> = text.chars().collect();
+        let first = cs.remove(0);
+        let big_laten = format!("{}-{}ay", cs.iter().collect::<String>(), first);
+
+        println!("{}", big_laten);
+    }
+
+    // 練習問題3: ハッシュマップによる雇用者管理
+    {                 
+        let add = |k: String, v: String, map: &mut HashMap<String, Vec<String>>| {
+            let mut vec = map.entry(k).or_insert(vec![]);
+            vec.push(v);
+        };
+
+        let show_department_employee = |department: &String, map: &HashMap<String, Vec<String>>| {            
+            let employees = if let Some(employees) = map.get(department) {
+                employees.clone()
+            } else {
+                Vec::new()
+            };
+
+            println!("{:?}", employees);
+        };
+
+        let show_all_employee = |map: &HashMap<String, Vec<String>>| {
+            for (k, v) in map.iter() {
+                println!("department: {}, employees: {:?}", k, v);
+            }
+        };
+
+        let mut map = HashMap::new();
+        add(String::from("Engineering"), String::from("Sally"), &mut map);
+        add(String::from("Sales"), String::from("Amir"), &mut map);
+        show_department_employee(&String::from("Engineering"), &map);
+        show_department_employee(&String::from("Sales"), &map);
+        show_all_employee(&map);
     }
 }
