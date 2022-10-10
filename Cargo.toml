@@ -2,4 +2,5 @@
 members = [
   "common_collections",
   "error_handling",
+  "generics",
 ]
