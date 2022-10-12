@@ -55,7 +55,7 @@ pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
 }
 
 pub fn search_case_insensitive<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
-  let query = query.to_lowercase();
+  let query = query.to_lowercase();  
   let mut results = Vec::new();
 
   for line in contents.lines() {
@@ -67,15 +67,43 @@ pub fn search_case_insensitive<'a>(query: &str, contents: &'a str) -> Vec<&'a st
   results
 }
 
+fn get_contents(filename: &str) -> Result<String, std::io::Error> {
+  let mut file = File::open(filename)?;
+  let mut contents = String::new();
+  file.read_to_string(&mut contents)?;
+
+  Ok(contents)
+}
+
 #[cfg(test)]
 mod tests {
   use super::*;
+  use std::io;
 
 const CONTENTS: &str = "\
 Rust:
 safe, fast, productive.
 Pick three.
 Trust me.";
+
+  #[test]
+  fn get_contents_no_error() -> Result<(), io::Error> {
+    let result = get_contents("./Hello.txt")?;    
+    assert_eq!(
+      result,
+      "Hello World"
+    );
+
+    Ok(())
+  }
+  
+  fn get_contents_with_error() {
+    if let Err(err) = get_contents("./not_exist.txt") {
+      assert_eq!(err.kind(), io::ErrorKind::NotFound);
+    } else {
+      panic!("loading ./not_exist.txt returns no error");
+    }    
+  }
 
   #[test]
   fn one_result() {
