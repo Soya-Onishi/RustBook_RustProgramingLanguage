@@ -40,7 +40,7 @@ mod tests {
     }
 
     #[test]
-    fn larget_can_hold_smaller() {
+    fn larger_can_hold_smaller() {
         let larger = Rectangle {
             width: 8,
             height: 7,
@@ -80,5 +80,11 @@ mod tests {
         } else {
             Err(String::from("two plus two does not equal four"))
         }
+    }
+
+    #[test]
+    #[ignore]
+    fn no_capture() {
+        println!("set --nocapture make visible this");        
     }
 }
