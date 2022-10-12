@@ -3,4 +3,5 @@ members = [
   "common_collections",
   "error_handling",
   "generics",
+  "unit_test/adder",
 ]
