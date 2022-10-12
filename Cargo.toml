@@ -4,4 +4,5 @@ members = [
   "error_handling",
   "generics",
   "unit_test/adder",
+  "minigrep",
 ]
