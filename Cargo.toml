@@ -5,4 +5,5 @@ members = [
   "generics",
   "unit_test/adder",
   "minigrep",
+  "functional",
 ]
