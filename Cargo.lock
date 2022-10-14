@@ -7,6 +7,10 @@ name = "adder"
 version = "0.1.0"
 
 [[package]]
+name = "cargo_detail"
+version = "0.1.0"
+
+[[package]]
 name = "common_collections"
 version = "0.1.0"
 

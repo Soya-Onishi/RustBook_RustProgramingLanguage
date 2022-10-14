@@ -81,7 +81,7 @@ impl Counter {
 }
 
 impl Iterator for Counter {
-    type Item = u32
+    type Item = u32;
 
     fn next(&mut self) -> Option<u32> {
         let ret = self.count;

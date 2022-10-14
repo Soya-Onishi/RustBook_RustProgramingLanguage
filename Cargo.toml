@@ -6,4 +6,5 @@ members = [
   "unit_test/adder",
   "minigrep",
   "functional",
+  "cargo_detail",
 ]
