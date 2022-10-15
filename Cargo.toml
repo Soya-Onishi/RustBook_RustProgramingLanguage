@@ -7,4 +7,5 @@ members = [
   "minigrep",
   "functional",
   "cargo_detail",
+  "smart_pointer",
 ]

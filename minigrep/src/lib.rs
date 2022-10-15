@@ -25,7 +25,7 @@ impl Config {
 }
 
 pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
-  get_contents(&config.filename);
+  let contents = get_contents(&config.filename)?;
 
   let results = if config.case_sensitive {
     search(&config.query, &contents)
