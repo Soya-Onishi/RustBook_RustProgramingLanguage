@@ -33,6 +33,20 @@ impl Drop for CustomSmartPointer {
     }
 }
 
+enum Cyclic {
+    Loop(RefCell<Rc<Cyclic>>),
+    None,
+}
+
+impl Cyclic {
+    fn ret(&self) -> &RefCell<Rc<Cyclic>> {
+        match *self {
+            Cyclic::Loop(ref elem) => elem,
+            Cyclic::None => panic!(),
+        }
+    }
+}
+
 fn main() {
     let list = List::Cons(
         1,
@@ -87,6 +101,12 @@ fn main() {
         *b.borrow_mut() += 10;
         println!("value = {:?}, a = {:?}, b = {:?}", &value, &a, &b);
     }    
+
+    // 循環参照によるメモリリークの例
+    let cyclic0 = Rc::new(Cyclic::Loop(RefCell::new(Rc::new(Cyclic::None))));
+    let cyclic1 = Rc::new(Cyclic::Loop(RefCell::new(Rc::clone(&cyclic0))));
+    *cyclic0.ret().borrow_mut() = Rc::clone(&cyclic1);
+    
 }
 
 fn hello(msg: &str) {
