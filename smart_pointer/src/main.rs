@@ -1,4 +1,6 @@
+use std::cell::RefCell;
 use std::ops::Deref;
+use std::rc::Rc;
 
 #[derive(Debug)]
 enum List<T> {
@@ -57,6 +59,34 @@ fn main() {
     let d = CustomSmartPointer { data: String::from("Another Data") };
     std::mem::drop(d);
     println!("CustomSmartPointer instantiated");    
+
+    let num = Rc::new(42);
+    println!("ref counter: {}", Rc::strong_count(&num));
+    // Rcではcloneするときに<variable>.clone()ではなくRc::clone(<variable>)と記述する
+    // Rc::cloneを使うことで、他のcloneのようにディープコピーするのではなく
+    // 参照カウンタを増加させるだけの処理であることがひと目でわかる。
+    let another = Rc::clone(&num);
+    println!("num = {}, another = {}", num, another);
+    println!("ref counter: {}", Rc::strong_count(&num));
+
+    // RcとRefCellを組み合わせて複数の所有者が同じ値をいじる処理を作成する
+    let value = Rc::new(RefCell::new(1));
+    let a = Rc::clone(&value);
+    let b = Rc::clone(&value);
+
+    // どの変数で値を変更しても、すべての値に対して変更が反映される
+    {
+        *value.borrow_mut() += 10;
+        println!("value = {:?}, a = {:?}, b = {:?}", &value, &a, &b);
+    }
+    {
+        *a.borrow_mut() += 10;
+        println!("value = {:?}, a = {:?}, b = {:?}", &value, &a, &b);
+    }
+    {
+        *b.borrow_mut() += 10;
+        println!("value = {:?}, a = {:?}, b = {:?}", &value, &a, &b);
+    }    
 }
 
 fn hello(msg: &str) {
