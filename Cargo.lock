@@ -31,5 +31,9 @@ name = "minigrep"
 version = "0.1.0"
 
 [[package]]
+name = "multi_threads"
+version = "0.1.0"
+
+[[package]]
 name = "smart_pointer"
 version = "0.1.0"

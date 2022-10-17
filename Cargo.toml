@@ -8,4 +8,5 @@ members = [
   "functional",
   "cargo_detail",
   "smart_pointer",
+  "multi_threads",
 ]
