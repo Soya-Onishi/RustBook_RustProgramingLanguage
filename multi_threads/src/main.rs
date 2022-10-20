@@ -1,6 +1,7 @@
 use std::thread;
 use std::time::Duration;
 use std::sync::mpsc;
+use std::sync::{Mutex, Arc};
 
 fn main() {
     let v = vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
@@ -65,4 +66,29 @@ fn main() {
     for received in rx {
         println!("Got Numbers from multiple Tx: {}", received);
     }
+
+    // RcにはSendトレイトの実装がないのでスレッド間で所有権のmoveができない。
+    // Arcを代わりに使用することで可能になる。
+    let counter  = Arc::new(Mutex::new(0));
+    let mut handles = vec![];
+
+    for _ in 0..10 {
+        let counter = Arc::clone(&counter);
+        let handle = thread::spawn(move || {
+            let mut num = counter.lock().unwrap();
+            *num += 1;
+        });
+
+        handles.push(handle);
+    }
+
+    for handle in handles {
+        handle.join().unwrap();
+    }    
+
+    println!("count = {}", counter.lock().unwrap());
+    
+    // Rc      <-> Arc
+    // RefCell <-> Mutex
+    // RefCellはSyncがないため、スレッド間での借用は安全ではない。    
 }
