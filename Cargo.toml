@@ -10,4 +10,5 @@ members = [
   "smart_pointer",
   "multi_threads",
   "oop",
+  "pattern_matching",
 ]
