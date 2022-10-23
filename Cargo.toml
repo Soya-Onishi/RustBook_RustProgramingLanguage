@@ -9,4 +9,5 @@ members = [
   "cargo_detail",
   "smart_pointer",
   "multi_threads",
+  "oop",
 ]
