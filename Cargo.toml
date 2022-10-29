@@ -11,4 +11,7 @@ members = [
   "multi_threads",
   "oop",
   "pattern_matching",
+  "macros",
+  "hello_macro",
+  "hello_macro_derive",
 ]
