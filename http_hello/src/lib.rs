@@ -15,9 +15,14 @@ impl<F: FnOnce()> FnBox for F {
     }
 }
 
+enum Message {
+  NewJob(Job),
+  Terminate,
+}
+
 pub struct ThreadPool {
     workers: Vec<Worker>,
-    sender: mpsc::Sender<Job>,
+    sender: mpsc::Sender<Message>,
 }
 
 impl ThreadPool {
@@ -41,23 +46,50 @@ impl ThreadPool {
         F: FnOnce() + Send + 'static,
     {
         let job = Box::new(f);
-        self.sender.send(job).unwrap();
+        self.sender.send(Message::NewJob(job)).unwrap();
     }
+}
+
+impl Drop for ThreadPool {
+  fn drop(&mut self) {
+      for _ in &self.workers {
+        self.sender.send(Message::Terminate).unwrap();
+      }
+      
+      for worker in &mut self.workers {        
+        println!("Shutting down worker {}", worker.id);        
+        if let Some(thread) = worker.thread.take() {
+          
+          thread.join().unwrap();
+        }
+
+      }
+  }
 }
 
 struct Worker {
     id: usize,
-    thread: thread::JoinHandle<()>,
+    thread: Option<thread::JoinHandle<()>>,
 }
 
 impl Worker {
-    fn new(id: usize, receiver: Arc<Mutex<mpsc::Receiver<Job>>>) -> Worker {
+    fn new(id: usize, receiver: Arc<Mutex<mpsc::Receiver<Message>>>) -> Worker {
         let thread = thread::spawn(move || loop {
-            let job = receiver.lock().unwrap().recv().unwrap();
-            println!("Worker {} got a job!", id);
-            job.call_box();
+            match receiver.lock().unwrap().recv().unwrap() {
+              Message::NewJob(job) => {
+                println!("Worker {} got a job!", id);
+                job.call_box();
+              },
+              Message::Terminate => {
+                println!("Worker {} terminate", id);
+                break;
+              }
+            };            
         });
 
-        Worker { id, thread }
+        Worker { 
+          id, 
+          thread: Some(thread),
+        }
     }
 }
